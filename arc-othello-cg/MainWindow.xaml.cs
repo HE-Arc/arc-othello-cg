@@ -23,6 +23,9 @@ namespace arc_othello_cg
         public MainWindow()
         {
             InitializeComponent();
+
+            GameManager gameManager = new GameManager();
+            gameManager.Run();
         }
     }
 }
