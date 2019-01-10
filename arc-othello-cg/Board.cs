@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 using System.Threading.Tasks;
 
 using IPlayableAlias = IPlayable.IPlayable;
@@ -41,13 +42,16 @@ namespace arc_othello_cg
                 {
                     switch (board[i, j]) {
                         case Pawn.Empty:
-                            stringBuilder.Append(".");
+                            stringBuilder.Append(". ");
                             break;
                         case Pawn.White:
-                            stringBuilder.Append("W");
+                            stringBuilder.Append("X ");
                             break;
                         case Pawn.Black:
-                            stringBuilder.Append("B");
+                            stringBuilder.Append("O ");
+                            break;
+                        case Pawn.Playable:
+                            stringBuilder.Append("+ ");
                             break;
                         default:
                             throw new Exception();
@@ -78,13 +82,70 @@ namespace arc_othello_cg
         /// <returns>true or false</returns>
         public bool IsPlayable(int column, int line, bool isWhite)
         {
+            int playerPawn = isWhite ? Pawn.White : Pawn.Black;
+            int enemyPawn = isWhite ? Pawn.Black : Pawn.White;
+
             // Bail early if tile is already occupied
             if (board[line, column] != Pawn.Empty)
             {
                 return false;
             }
+            
+            for(int y = -1; y <= 1; y++)
+            {
+                int currentTestY = line + y;
 
+                if(currentTestY < 0 || currentTestY >= Constants.NbRow)
+                {
+                    continue;
+                }
+                
+                for (int x = -1; x <= 1; x++)
+                {
+                    int currentTestX = column + x;
+
+                    if (currentTestX < 0 || currentTestX >= Constants.NbColumn || (x == 0 && y == 0))
+                    {
+                        continue;
+                    }
+
+                    if (board[currentTestY, currentTestX] != Pawn.Empty && board[currentTestY, currentTestX] != Pawn.Playable)
+                    {
+                        if (IsValidDirection(line, column, x, y, playerPawn, enemyPawn))
+                        {
+                            board[line, column] = Pawn.Playable;
+                            
+                        }
+                    }
+                }
+            }
+                        
             return true;
+        }
+
+        private bool IsValidDirection(int line, int columnm, int dX, int dY, int playerPawn, int enemyPawn)
+        {
+            line += dY;
+            columnm += dX;
+
+            bool enemyCrossed = false;
+
+            while (board[line, columnm] != Pawn.Empty && board[line, columnm] != Pawn.Playable)
+            {
+                if (board[line, columnm] == enemyPawn)
+                {
+                    enemyCrossed = true;
+                }
+
+                if(enemyCrossed && board[line, columnm] == playerPawn)
+                {
+                    return true;
+                }
+
+                line += dY;
+                columnm += dX;
+            }
+            return false;
         }
 
         public bool PlayMove(int column, int line, bool isWhite)
