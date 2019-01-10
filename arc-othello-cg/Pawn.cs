@@ -11,5 +11,6 @@ namespace arc_othello_cg
         public const int Empty = -1;
         public const int White = 0;
         public const int Black = 1;
+        public const int Playable = 2;
     }
 }

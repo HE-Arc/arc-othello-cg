@@ -18,6 +18,18 @@ namespace arc_othello_cg
         {
             board = new Board();
 
+           
+            for (int i = 0; i < Constants.NbRow; i++)
+            {
+                for (int j = 0; j < Constants.NbColumn; j++)
+                {
+                    board.IsPlayable(j, i, false);
+                }
+            }
+            
+
+            /*board.IsPlayable(5, 5, true);*/
+
             Console.WriteLine(board);
             //while (!IsGameOver())
             //{
@@ -26,6 +38,8 @@ namespace arc_othello_cg
             //        // @todo
             //    }
             //}
+
+            
         }
 
         public bool IsGameOver()
