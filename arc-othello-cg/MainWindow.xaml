@@ -5,8 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:arc_othello_cg"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="MainWindow" Height="600" Width="800" MinHeight="600" MinWidth="800">
+
+    <Grid x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Viewbox x:Name="Box" Grid.Column="1">
+            <UniformGrid x:Name="PlayGrid" >
+                <UniformGrid.Background>
+                    <ImageBrush/>
+                </UniformGrid.Background>
+            </UniformGrid>
+        </Viewbox>
     </Grid>
 </Window>
