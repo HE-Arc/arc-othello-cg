@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace arc_othello_cg
 {
@@ -20,35 +13,101 @@ namespace arc_othello_cg
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow() : this(9, 7)
-        {
+        GameManager gameManager;
 
-        }
-
-        public MainWindow(int width, int height)
+        public MainWindow()
         {
             InitializeComponent();
+            InitBoard();
+            gameManager = new GameManager(this);
+            gameManager.DisplayBoard();
+        }
 
-            GameManager gameManager = new GameManager();
-            gameManager.Run();
-
+        private void InitBoard()
+        {
             Box.Stretch = Stretch.Uniform;
+            PlayGrid.Rows = Constants.NbRow;
+            PlayGrid.Columns = Constants.NbColumn;
 
-            PlayGrid.Columns = width;
-            PlayGrid.Rows = height;
-
-            for (int row = 0; row < height; row++)
+            for (int row = 0; row < Constants.NbRow; row++)
             {
-                for (int col = 0; col < width; col++)
+                for (int col = 0; col < Constants.NbColumn; col++)
                 {
-                    Image btn = new Image();
-                    btn.Source = new BitmapImage(new Uri(@"/Resources/two.png", UriKind.Relative));
 
-                    PlayGrid.Children.Add(btn);
-                    Grid.SetColumn(btn, col);
-                    Grid.SetRow(btn, row);
+                    Label lbl = new Label();
+                    lbl.BorderBrush = new SolidColorBrush(Color.FromRgb(73, 136, 64));
+                    lbl.BorderThickness = new Thickness(Constants.BorderThickness);
+                
+                    lbl.MouseDown += ImageMouseDown;
+                    lbl.MouseEnter += ImageMouseEnter;
+                    lbl.MouseLeave += ImageMouseLeave;
+
+                    PlayGrid.Children.Add(lbl);
+
+                    Grid.SetColumn(lbl, col);
+                    Grid.SetRow(lbl, row);
                 }
             }
+        }
+
+        public void SetCaseImage(int column, int line, bool isWhite)
+        {
+            Label img = (Label)PlayGrid.Children.Cast<UIElement>().First(e => Grid.GetRow(e) == line && Grid.GetColumn(e) == column);
+
+            if (!gameManager.IsPlayabe(column, line))
+            {
+                img.Background = Constants.getPawnBrush(gameManager.GetPawn(column, line), Constants.NormalOpacity);
+            }
+            else
+            {
+                img.Background = Constants.getPawnBrush(Pawn.getPawn(gameManager.IsCurrentPlayerWhite()), Constants.PlayableOpacity);
+            }
+        }
+
+        // +----------
+        // | 
+        // +----------
+
+        private void ImageMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Label img = (Label)sender;
+            int colume = Grid.GetColumn(img);
+            int line = Grid.GetRow(img);
+
+            if(gameManager.IsPlayabe(colume, line))
+            {
+                gameManager.Play(colume, line);
+            }
+        }
+        
+        private void ImageMouseEnter(object sender, MouseEventArgs e)
+        {
+            Label img = (Label)sender;
+            int column = Grid.GetColumn(img);
+            int line = Grid.GetRow(img);
+            
+            if (gameManager.GetPawn(column, line) == Pawn.Empty)
+            {
+                img.Background = Constants.getPawnBrush(Pawn.getPawn(gameManager.IsCurrentPlayerWhite()), Constants.NormalOpacity);
+            }
+        }
+        
+        private void ImageMouseLeave(object sender, MouseEventArgs e)
+        {
+            Label img = (Label)sender;
+            int column = Grid.GetColumn(img);
+            int line = Grid.GetRow(img);
+            
+
+            if (!gameManager.IsPlayabe(column, line))
+            {
+                img.Background = Constants.getPawnBrush(gameManager.GetPawn(column, line), Constants.NormalOpacity);
+            }
+            else
+            {
+                img.Background = Constants.getPawnBrush(Pawn.getPawn(gameManager.IsCurrentPlayerWhite()), Constants.PlayableOpacity);
+            }
+            
         }
     }
 }

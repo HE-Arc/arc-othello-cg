@@ -81,7 +81,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Pawn.cs" />
-    <Compile Include="Player.cs" />
     <Compile Include="PlayerInfo.xaml.cs">
       <DependentUpon>PlayerInfo.xaml</DependentUpon>
     </Compile>
@@ -108,13 +107,22 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\empty.png" />
-    <Resource Include="Resources\one.png" />
-    <Resource Include="Resources\two.png" />
-    <Resource Include="Resources\valid.png" />
+    <Resource Include="Resources\frame\corner-bl.png" />
+    <Resource Include="Resources\frame\corner-tl.png" />
+    <Resource Include="Resources\frame\edge-b.png" />
+    <Resource Include="Resources\frame\edge-l.png" />
+    <Resource Include="Resources\frame\edge-t.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\black.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

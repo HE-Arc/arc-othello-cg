@@ -50,9 +50,6 @@ namespace arc_othello_cg
                         case Pawn.Black:
                             stringBuilder.Append("O ");
                             break;
-                        case Pawn.Playable:
-                            stringBuilder.Append("+ ");
-                            break;
                         default:
                             throw new Exception();
                     }
@@ -73,6 +70,8 @@ namespace arc_othello_cg
             return "Ah que coucou";
         }
 
+
+
         /// <summary>
         /// Returns true if the move is valid for specified color
         /// </summary>
@@ -81,11 +80,7 @@ namespace arc_othello_cg
         /// <param name="isWhite"></param>
         /// <returns>true or false</returns>
         public bool IsPlayable(int column, int line, bool isWhite)
-        {
-            int playerPawn = isWhite ? Pawn.White : Pawn.Black;
-            int enemyPawn = isWhite ? Pawn.Black : Pawn.White;
-
-            // Bail early if tile is already occupied
+        {          
             if (board[line, column] != Pawn.Empty)
             {
                 return false;
@@ -109,50 +104,101 @@ namespace arc_othello_cg
                         continue;
                     }
 
-                    if (board[currentTestY, currentTestX] != Pawn.Empty && board[currentTestY, currentTestX] != Pawn.Playable)
+                    if (board[currentTestY, currentTestX] != Pawn.Empty)
                     {
-                        if (IsValidDirection(line, column, x, y, playerPawn, enemyPawn))
+                        if (IsValidDirection(column, line, x, y, isWhite))
                         {
-                            board[line, column] = Pawn.Playable;
-                            
+                            return true;
                         }
                     }
                 }
             }
                         
-            return true;
+            return false;
         }
 
-        private bool IsValidDirection(int line, int columnm, int dX, int dY, int playerPawn, int enemyPawn)
+        private bool IsValidDirection(int column, int line, int dX, int dY, bool isWhite)
         {
             line += dY;
-            columnm += dX;
+            column += dX;
+
+            if(board[line, column] == Pawn.getPawn(isWhite))
+            {
+                return false;
+            }
 
             bool enemyCrossed = false;
-
-            while (board[line, columnm] != Pawn.Empty && board[line, columnm] != Pawn.Playable)
+            
+            while(IsOnBoard(column, line) && board[line, column] != Pawn.Empty)
             {
-                if (board[line, columnm] == enemyPawn)
+                if (board[line, column] != Pawn.getPawn(isWhite))
                 {
                     enemyCrossed = true;
                 }
 
-                if(enemyCrossed && board[line, columnm] == playerPawn)
+                if(enemyCrossed && board[line, column] == Pawn.getPawn(isWhite))
                 {
                     return true;
                 }
 
                 line += dY;
-                columnm += dX;
+                column += dX;
             }
+
+            return false;
+        }
+        
+        public bool PlayMove(int column, int line, bool isWhite)
+        {
+            if(IsPlayable(column, line, isWhite))
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    int currentTestY = line + y;
+
+                    if (currentTestY < 0 || currentTestY >= Constants.NbRow)
+                    {
+                        continue;
+                    }
+
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        int currentTestX = column + x;
+
+                        if (currentTestX < 0 || currentTestX >= Constants.NbColumn || (x == 0 && y == 0))
+                        {
+                            continue;
+                        }
+
+                        Console.WriteLine(IsValidDirection(column, line, x, y, isWhite) + " " + x + " " + y);
+
+                        if (IsValidDirection(column, line, x, y, isWhite))
+                        {
+                            SwapPawns(column, line, x, y, isWhite);
+                        }
+                    }
+                }
+                return false;
+            }
+
             return false;
         }
 
-        public bool PlayMove(int column, int line, bool isWhite)
+        private void SwapPawns(int column, int line, int dX, int dY, bool isWhite)
         {
-            throw new NotImplementedException();
-        }
+            board[line, column] = Pawn.getPawn(isWhite);
+            line += dY;
+            column += dX;
 
+            while(IsOnBoard(column, line) && board[line, column] != Pawn.getPawn(isWhite) && board[line, column] != Pawn.Empty)
+            {
+                board[line, column] = Pawn.getPawn(isWhite);
+
+                line += dY;
+                column += dX;
+            }
+        }
+        
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             throw new NotImplementedException();
@@ -167,19 +213,46 @@ namespace arc_othello_cg
             return board;
         }
 
-        public int GetWhiteScore()
+        public void SetPawn(int column, int line, bool isWhite)
         {
-            throw new NotImplementedException();
+            if(IsOnBoard(column, line))
+            {
+                board[line, column] = Pawn.getPawn(isWhite);
+            }
         }
 
-        public int GetBlackScore()
+        public int GetPawn(int column, int line)
         {
-            throw new NotImplementedException();
+             return board[line, column];
         }
 
         private int GetScore(bool isWhite)
         {
-            return 0;
+            int score = 0;
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    score += board[i, j] == Pawn.getPawn(isWhite) ? 1 : 0;
+                }
+            }
+            return score;
         }
+
+        public int GetWhiteScore()
+        {
+            return GetScore(true);
+        }
+
+        public int GetBlackScore()
+        {
+            return GetScore(false);
+        }
+        
+        private bool IsOnBoard(int column, int line)
+        {
+            return line >= 0 && line < Constants.NbRow && column >= 0 && column < Constants.NbColumn;
+        }
+
     }
 }

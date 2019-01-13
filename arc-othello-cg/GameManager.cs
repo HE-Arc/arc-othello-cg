@@ -12,40 +12,65 @@ namespace arc_othello_cg
     class GameManager
     {
         private Board board;
-        private Player[] players = new Player[Constants.NbPlayers];
-
-        public void Run()
+        private bool isCurrentPlayerWhite;
+        private MainWindow mainWindow;
+        
+        public GameManager(MainWindow mainWindow)
         {
-            board = new Board();
+            this.board = new Board();
+            this.isCurrentPlayerWhite = false;
+            this.mainWindow = mainWindow;
+        }
+        
+        public void Play(int column, int line)
+        {
+            board.PlayMove(column, line, isCurrentPlayerWhite);
+            
+            isCurrentPlayerWhite = !isCurrentPlayerWhite;
+            DisplayBoard();
+            Console.WriteLine(board);
+        }
 
-           
-            for (int i = 0; i < Constants.NbRow; i++)
+        public void DisplayBoard()
+        {
+            for (int line = 0; line < Constants.NbRow; line++)
             {
-                for (int j = 0; j < Constants.NbColumn; j++)
+                for (int column = 0; column < Constants.NbColumn; column++)
                 {
-                    board.IsPlayable(j, i, false);
+                    mainWindow.SetCaseImage(column, line, isCurrentPlayerWhite);
                 }
             }
-            
 
-            /*board.IsPlayable(5, 5, true);*/
+            Console.WriteLine(board.GetWhiteScore() + " : " + board.GetBlackScore());
+        }
 
-            Console.WriteLine(board);
-            //while (!IsGameOver())
-            //{
-            //    foreach (IPlayableAlias p in players)
-            //    {
-            //        // @todo
-            //    }
-            //}
-
-            
+        public bool IsCurrentPlayerWhite()
+        {
+            return isCurrentPlayerWhite;
         }
 
         public bool IsGameOver()
         {
+            
+            
             // @todo
             return false;
         }
+
+        public int[,] GetBoard()
+        {
+            return board.GetBoard();
+        }
+
+        public int GetPawn(int column, int line)
+        {
+            return board.GetPawn(column, line);
+        }
+
+        public bool IsPlayabe(int column, int line)
+        {
+            return board.IsPlayable(column, line, isCurrentPlayerWhite);
+        }
+
     }
 }
