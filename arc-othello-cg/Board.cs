@@ -9,6 +9,7 @@ using IPlayableAlias = IPlayable.IPlayable;
 
 namespace arc_othello_cg
 {
+    [Serializable]
     class Board : IPlayableAlias
     {
         private int[,] board = new int[Constants.NbRow, Constants.NbColumn];
@@ -54,7 +55,6 @@ namespace arc_othello_cg
                             throw new Exception();
                     }
                 }
-
                 stringBuilder.AppendLine();
             }
 
@@ -67,11 +67,9 @@ namespace arc_othello_cg
         /// <returns>true or false</returns>
         public string GetName()
         {
-            return "Ah que coucou";
+            return "IACG";
         }
-
-
-
+        
         /// <summary>
         /// Returns true if the move is valid for specified color
         /// </summary>
@@ -169,9 +167,7 @@ namespace arc_othello_cg
                         {
                             continue;
                         }
-
-                        Console.WriteLine(IsValidDirection(column, line, x, y, isWhite) + " " + x + " " + y);
-
+                        
                         if (IsValidDirection(column, line, x, y, isWhite))
                         {
                             SwapPawns(column, line, x, y, isWhite);

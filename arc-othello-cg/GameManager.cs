@@ -1,34 +1,85 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using IPlayableAlias = IPlayable.IPlayable;
+using System.Windows.Media;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace arc_othello_cg
 {
-    // @todo Implement it as a singleton ?
-    class GameManager
+    [Serializable]
+    class GameManager : INotifyPropertyChanged
     {
-        private Board board;
-        private bool isCurrentPlayerWhite;
-        private MainWindow mainWindow;
         
-        public GameManager(MainWindow mainWindow)
+        private Board board;
+        private bool IsCurrentPlayerWhite { get; set; }
+        private List<Point> playables = new List<Point>();
+
+        // Players infos
+
+        private int playerWhiteScore;
+        private int playerBlackScore;
+
+        [NonSerialized()] private DispatcherTimer timer;
+        [NonSerialized()] private Stopwatch PlayerWhiteTimer;
+        [NonSerialized()] private Stopwatch PlayerBlackTimer;
+
+        private TimeSpan playerWhiteTime;
+        private TimeSpan playerBlackTime;
+        
+        // +----------------------------------------------------------------------
+        // | Constructors
+        // +----------------------------------------------------------------------
+
+        public GameManager()
         {
             this.board = new Board();
-            this.isCurrentPlayerWhite = false;
-            this.mainWindow = mainWindow;
+            this.IsCurrentPlayerWhite = true;
+
+            ResetTime();
+            Init();
         }
-        
+
+        // +----------------------------------------------------------------------
+        // | PUBLIC methods
+        // +----------------------------------------------------------------------
+
         public void Play(int column, int line)
         {
-            board.PlayMove(column, line, isCurrentPlayerWhite);
-            
-            isCurrentPlayerWhite = !isCurrentPlayerWhite;
-            DisplayBoard();
-            Console.WriteLine(board);
+            if(IsCurrentPlayerWhite)
+            {
+                PlayerWhiteTimer.Stop();
+                PlayerBlackTimer.Start();
+            }
+            else
+            {
+                PlayerWhiteTimer.Start();
+                PlayerBlackTimer.Stop();
+            }
+
+            if (playables.Contains(new Point(column, line)))
+            {
+                board.PlayMove(column, line, IsCurrentPlayerWhite);
+
+                IsCurrentPlayerWhite = !IsCurrentPlayerWhite;
+
+                UpdatePlayersInfo();
+                UpdatePlayables();
+
+                DisplayBoard();
+
+                if (playables.Count == 0)
+                {
+                    IsCurrentPlayerWhite = !IsCurrentPlayerWhite;
+                    DisplayBoard();
+
+                    if (playables.Count == 0)
+                    {
+                        EndGame();
+                    }
+                }
+            }
         }
 
         public void DisplayBoard()
@@ -37,39 +88,153 @@ namespace arc_othello_cg
             {
                 for (int column = 0; column < Constants.NbColumn; column++)
                 {
-                    mainWindow.SetCaseImage(column, line, isCurrentPlayerWhite);
+                    Brush brush = GetCaseBrush(column, line);
+                    Constants.mainWindow.SetCaseImage(column, line, brush);
                 }
             }
-
-            Console.WriteLine(board.GetWhiteScore() + " : " + board.GetBlackScore());
         }
 
-        public bool IsCurrentPlayerWhite()
+        public Brush GetCaseBrush(int column, int line)
         {
-            return isCurrentPlayerWhite;
-        }
+            float opactity = Constants.NormalOpacity;
+            Brush brush = Constants.getPawnBrush(board.GetPawn(column, line), opactity);
 
-        public bool IsGameOver()
+            if (playables.Contains(new Point(column, line)))
+            {
+                opactity = Constants.PlayableOpacity;
+                brush = Constants.getPawnBrush(Pawn.getPawn(IsCurrentPlayerWhite), opactity);
+            }
+            return brush;
+        }
+        
+        public void Init()
         {
+            timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(TimerTick);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+
+            PlayerWhiteTimer = new Stopwatch();
+            PlayerBlackTimer = new Stopwatch();
+
+            Console.WriteLine(playerWhiteTime.TotalSeconds);
+            Console.WriteLine(playerBlackTime.TotalSeconds);
+
+            TimerStart();
             
+            UpdatePlayables();
+            UpdatePlayersInfo();
+
+            DisplayBoard();
+        }
+
+        public void TimerStart()
+        {
+            timer.Start();
+            if (IsCurrentPlayerWhite)
+            {
+                PlayerWhiteTimer.Start();
+            }
+            else
+            {
+                PlayerBlackTimer.Start();
+            }
+        }
+
+        public void TimerPause()
+        {
+            PlayerWhiteTimer.Stop();
+            PlayerBlackTimer.Stop();
+            timer.Stop();
+        }
+
+        public void SaveTime()
+        {
+            playerWhiteTime += PlayerWhiteTimer.Elapsed;
+            playerBlackTime += PlayerBlackTimer.Elapsed;
+        }
+
+        public void ResetTime()
+        {
+            playerBlackTime = new TimeSpan();
+            playerWhiteTime = new TimeSpan();
+        }
+
+        // +----------------------------------------------------------------------
+        // | PRIVATE methods
+        // +----------------------------------------------------------------------
+
+        private void UpdatePlayables()
+        {
+            playables.Clear();
+
+            for (int line = 0; line < Constants.NbRow; line++)
+            {
+                for (int column = 0; column < Constants.NbColumn; column++)
+                {
+                    if (board.IsPlayable(column, line, IsCurrentPlayerWhite))
+                    {
+                        playables.Add(new Point(column, line));
+                    }
+                }
+            }
+        }
+
+        private void UpdatePlayersInfo()
+        {
+            PlayerWhiteScore = board.GetWhiteScore();
+            PlayerBlackScore = board.GetBlackScore();
+
+            Constants.mainWindow.UpdateSpace(playerWhiteScore, playerBlackScore);
+        }
+
+        private void EndGame()
+        {
+            string winner = board.GetWhiteScore() >= board.GetBlackScore() ? "Joueur blanc" : "Joueur noir";
             
-            // @todo
-            return false;
+            if (Constants.mainWindow.ShowComfirm(winner + " gagne la partie ! Voulez vous rejouer ?"))
+            {
+                Constants.mainWindow.ResetGame();
+            }
+        }
+        
+        private void TimerTick(object sender, EventArgs e)
+        {
+            TimeSpan tmpTimeWhite = PlayerWhiteTimer.Elapsed + playerWhiteTime;
+            TimeSpan tmpTimeBlack = PlayerBlackTimer.Elapsed + playerBlackTime;
+
+            Constants.mainWindow.SetTimes(tmpTimeWhite, tmpTimeBlack);
         }
 
-        public int[,] GetBoard()
-        {
-            return board.GetBoard();
-        }
+        // +----------------------------------------------------------------------
+        // | DataBinding
+        // +----------------------------------------------------------------------
 
-        public int GetPawn(int column, int line)
+        [field: NonSerialized()]
+        public event PropertyChangedEventHandler PropertyChanged;
+        
+        public int PlayerWhiteScore
         {
-            return board.GetPawn(column, line);
+            get { return playerWhiteScore; }
+            set
+            {
+                playerWhiteScore = value;
+                RaisePropertyChanged("PlayerWhiteScore");
+            }
         }
-
-        public bool IsPlayabe(int column, int line)
+        public int PlayerBlackScore
         {
-            return board.IsPlayable(column, line, isCurrentPlayerWhite);
+            get { return playerBlackScore; }
+            set
+            {
+                playerBlackScore = value;
+                RaisePropertyChanged("PlayerBlackScore");
+            }
+        }
+        
+        void RaisePropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
     }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -10,6 +6,8 @@ namespace arc_othello_cg
 {
     class Constants
     {
+        public static MainWindow mainWindow;
+
         public static int NbRow = 7;
         public static int NbColumn = 9;
         public static int NbPlayers = 2;
@@ -21,6 +19,8 @@ namespace arc_othello_cg
         public static Brush EmptyBrush = new SolidColorBrush(Color.FromArgb(0,0,0,0));
         public static Brush WhiteBrush = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/white.png")));
         public static Brush BlackBrush = new ImageBrush(new BitmapImage(new Uri("pack://application:,,,/Resources/black.png")));
+
+        public static Color BoardBorder = Color.FromRgb(73, 136, 64);
         
         public static Brush getPawnBrush(int pawn, float opacity)
         {
@@ -37,9 +37,10 @@ namespace arc_othello_cg
                     newBrush = BlackBrush.Clone();
                     break;
                 default:
-                    throw new Exception();
+                    newBrush = EmptyBrush.Clone();
+                    break;
             }
-
+        
             newBrush.Opacity = opacity;
             return newBrush;
         }

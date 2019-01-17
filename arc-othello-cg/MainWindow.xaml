@@ -5,26 +5,131 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:arc_othello_cg"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800" MinHeight="600" MinWidth="800" Background="#529848">
+        Title="MainWindow" Height="600" Width="800" MinHeight="600" MinWidth="800" Background="#529848" WindowStartupLocation="CenterScreen">
 
-    <Grid x:Name="MainGrid" Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="40"/>
-        </Grid.RowDefinitions>
+    <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*" MaxWidth="250px"/>
             <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="70"/>
         </Grid.ColumnDefinitions>
 
-        <Viewbox x:Name="Box" Grid.Column="1" Margin="5">
-            <Border BorderThickness="0.3" BorderBrush="#498840">
+        <Grid Margin="20,20,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="Resources/frame/corner-tl.png"/>
+            <Image Grid.Column="1" Source="Resources/frame/edge-t.png" Stretch="Fill" />
+            <Image Grid.Column="2" Source="Resources/frame/corner-tl.png" Stretch="Fill" FlowDirection="RightToLeft"/>
+
+            <Image Grid.Row="1" Source="Resources/frame/edge-l.png" Stretch="Fill" />
+            <Grid Grid.Row="1" Grid.Column="1" Background="#FF212121">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition x:Name="WhiteSpace" Height="1*" MinHeight="65"/>
+                    <RowDefinition x:Name="BlackSpace" Height="1*" MinHeight="65"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+
+                <Label x:Name="PlayerWhiteName" Content="Joueur blanc" Foreground="White" FontSize="20" FontFamily="Kristen ITC" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                <Label x:Name="PlayerBlackName" Content="Joueur noir" Foreground="White" FontSize="20" FontFamily="Kristen ITC" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="4" />
+
+                <Label x:Name="PlayerWhiteTime" Content="0:0" Foreground="White" FontSize="20" FontFamily="Kristen ITC" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Margin="0,-10,0,0" />
+                <Label x:Name="PlayerBlackTime" Content="0:0" Foreground="White" FontSize="20" FontFamily="Kristen ITC" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="5" Margin="0,-10,0,0" />
+
+
+                <Grid Grid.Row="2" Margin="20,00,20,10" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="2"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Ellipse Fill="White" Grid.Column="1"/>
+                    <Ellipse Fill="White" Grid.Column="2" Grid.Row="1"/>
+                    <Rectangle Grid.Column="1" Grid.Row="1" Margin="5">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="Resources/strip.png" ViewportUnits="Absolute" TileMode="Tile" Viewport="0,0,20,20"/>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <Label Content="{Binding PlayerWhiteScore}" Foreground="White" FontSize="48" Grid.Row="1" Grid.Column="1" FontFamily="Kristen ITC" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FF212121" />
+                    <Ellipse Fill="White" Grid.Column="1" Grid.Row="2"/>
+                    <Ellipse Fill="White" Grid.Row="1"/>
+
+                </Grid>
+
+                <Grid Grid.Row="3" Margin="20,10,20,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="2"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Ellipse Fill="White" Grid.Column="1"/>
+                    <Ellipse Fill="White" Grid.Column="2" Grid.Row="1"/>
+                    <Label Content="{Binding PlayerBlackScore}" Foreground="White" FontSize="48" Grid.Row="1" Grid.Column="1" FontFamily="Kristen ITC" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Ellipse Fill="White" Grid.Column="1" Grid.Row="2"/>
+                    <Ellipse Fill="White" Grid.Row="1"/>
+
+                </Grid>
+            </Grid>
+            <Image Grid.Row="1" Grid.Column="2" Source="Resources/frame/edge-l.png" Stretch="Fill" FlowDirection="RightToLeft"/>
+
+            <Image Grid.Row="2" Source="Resources/frame/corner-bl.png"  Stretch="Fill"/>
+            <Image Grid.Row="2" Grid.Column="1" Source="Resources/frame/edge-b.png" Stretch="Fill"/>
+            <Image Grid.Row="2" Grid.Column="2" Source="Resources/frame/corner-bl.png" Stretch="Fill" FlowDirection="RightToLeft"/>
+
+
+        </Grid>
+
+        <Viewbox x:Name="Box" Grid.Column="1" Margin="20" OpacityMask="Black" >
+            <Border BorderThickness="0.3" BorderBrush="#498840" >
                 <UniformGrid x:Name="PlayGrid" Background="#529848"/>
             </Border>
         </Viewbox>
 
-        <local:PlayerInfo Margin="5" Grid.RowSpan="2"></local:PlayerInfo>
-        <local:PlayerInfo Margin="5" Grid.Column="2" Grid.RowSpan="2"></local:PlayerInfo>
+        <Rectangle x:Name="rct_shadow" Grid.ColumnSpan="3" Fill="#99000000" Panel.ZIndex="1" Visibility="Hidden" />
+
+        <Grid Grid.Column="2" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="65"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="65"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="1" Click="RestartGame" Margin="0,0,0,5" BorderBrush="White" Background="Black">
+                <Image Source="Resources/icons/new.png" Margin="7" />
+            </Button>
+            <Button Grid.Row="2" Click="SaveGame" Margin="0,5" Background="Black" BorderBrush="White">
+                <Image Source="Resources/icons/save.png" Margin="7" />
+            </Button>
+            <Button Grid.Row="3" Click="OpenGame" Margin="0,5,0,0" Background="Black" BorderBrush="White">
+                <Image Source="Resources/icons/open.png" Margin="7" />
+            </Button>
+        </Grid>
+
     </Grid>
 </Window>
