@@ -22,6 +22,13 @@ namespace arc_othello_cg
 
         public static Color BoardBorder = Color.FromRgb(73, 136, 64);
         
+
+        /// <summary>
+        /// Return the brush depending on the pawn
+        /// </summary>
+        /// <param name="pawn">The pawn</param>
+        /// <param name="opacity">The opactity (for playable positions)</param>
+        /// <returns></returns>
         public static Brush getPawnBrush(int pawn, float opacity)
         {
             Brush newBrush;

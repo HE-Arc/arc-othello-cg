@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:arc_othello_cg"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800" MinHeight="600" MinWidth="800" Background="#529848" WindowStartupLocation="CenterScreen">
+        Title="Sol'Othello" Height="600" Width="800" MinHeight="600" MinWidth="800" Background="#529848" WindowStartupLocation="CenterScreen">
 
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>

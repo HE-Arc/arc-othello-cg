@@ -45,6 +45,34 @@ namespace arc_othello_cg
         // | PUBLIC methods
         // +----------------------------------------------------------------------
 
+        /// <summary>
+        /// Init the gamemanager
+        /// </summary>
+        public void Init()
+        {
+            timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(TimerTick);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+
+            PlayerWhiteTimer = new Stopwatch();
+            PlayerBlackTimer = new Stopwatch();
+
+            Console.WriteLine(playerWhiteTime.TotalSeconds);
+            Console.WriteLine(playerBlackTime.TotalSeconds);
+
+            TimerStart();
+
+            UpdatePlayables();
+            UpdatePlayersInfo();
+
+            DisplayBoard();
+        }
+
+        /// <summary>
+        /// Play the move
+        /// </summary>
+        /// <param name="column">Column</param>
+        /// <param name="line">Line</param>
         public void Play(int column, int line)
         {
             if(IsCurrentPlayerWhite)
@@ -72,6 +100,7 @@ namespace arc_othello_cg
                 if (playables.Count == 0)
                 {
                     IsCurrentPlayerWhite = !IsCurrentPlayerWhite;
+                    UpdatePlayables();
                     DisplayBoard();
 
                     if (playables.Count == 0)
@@ -82,6 +111,9 @@ namespace arc_othello_cg
             }
         }
 
+        /// <summary>
+        /// Update the display of the board
+        /// </summary>
         public void DisplayBoard()
         {
             for (int line = 0; line < Constants.NbRow; line++)
@@ -94,6 +126,12 @@ namespace arc_othello_cg
             }
         }
 
+        /// <summary>
+        /// Get the brush to display depending on the position
+        /// </summary>
+        /// <param name="column">Column</param>
+        /// <param name="line">Line</param>
+        /// <returns>The brush</returns>
         public Brush GetCaseBrush(int column, int line)
         {
             float opactity = Constants.NormalOpacity;
@@ -106,27 +144,10 @@ namespace arc_othello_cg
             }
             return brush;
         }
-        
-        public void Init()
-        {
-            timer = new DispatcherTimer();
-            timer.Tick += new EventHandler(TimerTick);
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
-
-            PlayerWhiteTimer = new Stopwatch();
-            PlayerBlackTimer = new Stopwatch();
-
-            Console.WriteLine(playerWhiteTime.TotalSeconds);
-            Console.WriteLine(playerBlackTime.TotalSeconds);
-
-            TimerStart();
-            
-            UpdatePlayables();
-            UpdatePlayersInfo();
-
-            DisplayBoard();
-        }
-
+       
+        /// <summary>
+        /// Starts the timer
+        /// </summary>
         public void TimerStart()
         {
             timer.Start();
@@ -140,6 +161,9 @@ namespace arc_othello_cg
             }
         }
 
+        /// <summary>
+        /// Stop the timer
+        /// </summary>
         public void TimerPause()
         {
             PlayerWhiteTimer.Stop();
@@ -147,12 +171,18 @@ namespace arc_othello_cg
             timer.Stop();
         }
 
+        /// <summary>
+        /// ave the current players time in the timespans
+        /// </summary>
         public void SaveTime()
         {
             playerWhiteTime += PlayerWhiteTimer.Elapsed;
             playerBlackTime += PlayerBlackTimer.Elapsed;
         }
 
+        /// <summary>
+        /// Resets the timers
+        /// </summary>
         public void ResetTime()
         {
             playerBlackTime = new TimeSpan();

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -29,52 +28,37 @@ namespace arc_othello_cg
             gameManager = new GameManager();
             this.DataContext = gameManager;
         }
-        
-        private void InitWindows()
-        {
-            rct_shadow.Visibility = Visibility.Hidden;
-            Constants.mainWindow = this;
-        }
-        
-        private void InitBoard()
-        {
-            Box.Stretch = Stretch.Uniform;
-            PlayGrid.Rows = Constants.NbRow;
-            PlayGrid.Columns = Constants.NbColumn;
 
-            for (int row = 0; row < Constants.NbRow; row++)
-            {
-                for (int col = 0; col < Constants.NbColumn; col++)
-                {
+        // +----------------------------------------------------------------------
+        // | PUBLIC methods
+        // +----------------------------------------------------------------------
 
-                    Label lbl = new Label();
-                    lbl.BorderBrush = new SolidColorBrush(Constants.BoardBorder);
-                    lbl.BorderThickness = new Thickness(Constants.BorderThickness);
-                
-                    lbl.MouseDown += ImageMouseDown;
-                    lbl.MouseEnter += ImageMouseEnter;
-                    lbl.MouseLeave += ImageMouseLeave;
-
-                    PlayGrid.Children.Add(lbl);
-
-                    Grid.SetColumn(lbl, col);
-                    Grid.SetRow(lbl, row);
-                }
-            }
-        }
-
+        /// <summary>
+        /// Set the board label brush
+        /// </summary>
+        /// <param name="column">Column</param>
+        /// <param name="line">Line</param>
+        /// <param name="brush">The new brush</param>
         public void SetCaseImage(int column, int line, Brush brush)
         {
             Label img = (Label)PlayGrid.Children.Cast<UIElement>().First(e => Grid.GetRow(e) == line && Grid.GetColumn(e) == column);
             img.Background = brush;
         }
         
+        /// <summary>
+        /// Update the domination sapce
+        /// </summary>
+        /// <param name="whiteScore">White score</param>
+        /// <param name="blackScore">Black score</param>
         public void UpdateSpace(int whiteScore, int blackScore)
         {
             WhiteSpace.Height = new GridLength(whiteScore, GridUnitType.Star);
             BlackSpace.Height = new GridLength(blackScore, GridUnitType.Star);
         }
 
+        /// <summary>
+        /// Restart the game
+        /// </summary>
         public void ResetGame()
         {
             gameManager.TimerPause();
@@ -82,6 +66,13 @@ namespace arc_othello_cg
             this.DataContext = gameManager;
         }
 
+        /// <summary>
+        /// Show a comfirm windows
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <param name="yesOption">Yes option text</param>
+        /// <param name="noOption">No option text</param>
+        /// <returns></returns>
         public bool ShowComfirm(string message, string yesOption="Oui", string noOption="Non")
         {
             ComfirmWindows comfirm = new ComfirmWindows(message, yesOption, noOption);
@@ -100,13 +91,57 @@ namespace arc_othello_cg
             return result == true;
         }
 
+        /// <summary>
+        /// Display the times
+        /// </summary>
+        /// <param name="whiteTime">White time</param>
+        /// <param name="blackTime">Black time</param>
         public void SetTimes(TimeSpan whiteTime, TimeSpan blackTime)
         {
             PlayerWhiteTime.Content = whiteTime.Minutes + ":" + whiteTime.Seconds;
             PlayerBlackTime.Content = blackTime.Minutes + ":" + blackTime.Seconds;
         }
 
-        // EVENTS
+        // +----------------------------------------------------------------------
+        // | PRIVATE methods
+        // +----------------------------------------------------------------------
+
+        private void InitWindows()
+        {
+            rct_shadow.Visibility = Visibility.Hidden;
+            Constants.mainWindow = this;
+        }
+
+        private void InitBoard()
+        {
+            Box.Stretch = Stretch.Uniform;
+            PlayGrid.Rows = Constants.NbRow;
+            PlayGrid.Columns = Constants.NbColumn;
+
+            for (int row = 0; row < Constants.NbRow; row++)
+            {
+                for (int col = 0; col < Constants.NbColumn; col++)
+                {
+
+                    Label lbl = new Label();
+                    lbl.BorderBrush = new SolidColorBrush(Constants.BoardBorder);
+                    lbl.BorderThickness = new Thickness(Constants.BorderThickness);
+
+                    lbl.MouseDown += ImageMouseDown;
+                    lbl.MouseEnter += ImageMouseEnter;
+                    lbl.MouseLeave += ImageMouseLeave;
+
+                    PlayGrid.Children.Add(lbl);
+
+                    Grid.SetColumn(lbl, col);
+                    Grid.SetRow(lbl, row);
+                }
+            }
+        }
+
+        // +----------------------------------------------------------------------
+        // | EVENTS
+        // +----------------------------------------------------------------------
 
         private void ImageMouseDown(object sender, MouseButtonEventArgs e)
         {
